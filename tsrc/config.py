@@ -8,13 +8,16 @@ import xdg
 import tsrc
 
 
-def parse_config_file(file_path, config_schema):
+def parse_config_file(file_path, config_schema, round_trip=False):
     try:
         contents = file_path.text()
     except OSError as os_error:
         raise tsrc.InvalidConfig(file_path, "Could not read file: %s" % str(os_error))
     try:
-        parsed = ruamel.yaml.safe_load(contents)
+        if round_trip:
+            parsed = ruamel.yaml.safe_load(contents)
+        else:
+            parsed = ruamel.yaml.load(contents, ruamel.yaml.RoundTripLoader)
     except ruamel.yaml.error.YAMLError as yaml_error:
         # pylint: disable=no-member
         context = "(ligne %s, col %s) " % (
@@ -31,7 +34,10 @@ def parse_config_file(file_path, config_schema):
 
 def parse_tsrc_config(config_path=None):
     auth_schema = {
-        "gitlab": {
+        schema.Optional("gitlab"): {
+            "token": str
+        },
+        schema.Optional("github"): {
             "token": str
         }
     }
