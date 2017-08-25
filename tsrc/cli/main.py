@@ -78,6 +78,7 @@ def main(args=None):
     subparsers = parser.add_subparsers(title="subcommands", dest="command")
 
     subparsers.add_parser("version")
+    subparsers.add_parser("wizard")
 
     foreach_parser = workspace_subparser(subparsers, "foreach")
     foreach_parser.add_argument("cmd", nargs="*")
@@ -111,7 +112,9 @@ def main(args=None):
     message_group.add_argument("--wip", action="store_true", help="Mark merge request as WIP")
     message_group.add_argument("--ready", action="store_true", help="Mark merge request as ready")
     push_parser.add_argument("-a", "--assignee", dest="assignee")
+
     workspace_subparser(subparsers, "status")
+
     workspace_subparser(subparsers, "sync")
 
     args = parser.parse_args(args=args)

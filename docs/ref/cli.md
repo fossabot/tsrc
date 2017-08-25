@@ -24,7 +24,7 @@ $ tsrc init MANIFEST_URL
 ## Usage
 
 
-tsrc init MANIFEST_URL</dt>
+tsrc init MANIFEST_URL
 :   Initializes a new workspace.
 
     MANIFEST_URL should be a git URL containing a valid

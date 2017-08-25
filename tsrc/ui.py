@@ -372,20 +372,7 @@ def message_for_exception(exception, message):
 
 
 class Timer:
-    """ To be used as a decorator,
-    or as a with statement:
-
-    >>> @Timer("something")
-        def do_something():
-            foo()
-            bar()
-    # Or:
-    >>> with Timer("something")
-        foo()
-        bar()
-
-    This will print:
-    'something took 2h 33m 42s'
+    """ Display time taken when executing a list of statements
 
     """
     def __init__(self, description):
@@ -443,6 +430,23 @@ def read_input():
     return input()
 
 
+def ask_string(question, default=None):
+    """Ask the user to enter something.
+
+    Returns what the user entered
+    """
+    if default:
+        question += " (%s)" % default
+    info(green, "::", reset, question)
+    try:
+        answer = read_input()
+    except KeyboardInterrupt:
+        return default
+    if not answer:
+        return default
+    return answer
+
+
 def ask_choice(input_text, choices, *, desc_func=None):
     """
     Ask the user to choose from a list of choices.
@@ -486,6 +490,25 @@ def ask_choice(input_text, choices, *, desc_func=None):
         keep_asking = False
 
     return res
+
+
+def ask_yes_no(question, default=False):
+    """Ask the user to answer by yes or no"""
+    while True:
+        if default:
+            info(green, "::", reset, question, "(Y/n)")
+        else:
+            info(green, "::", reset, question, "(y/N)")
+        answer = read_input()
+        if answer.lower() in ["y", "yes"]:
+            return True
+        if answer.lower() in ["n", "no"]:
+            return False
+        if not answer:
+            return default
+        warning("Please answer by 'y' (yes) or 'n' (no) ")
+
+
 
 if __name__ == "__main__":
     info_1("Info 1")
