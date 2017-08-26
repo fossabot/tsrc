@@ -8,16 +8,13 @@ import xdg
 import tsrc
 
 
-def parse_config_file(file_path, config_schema, round_trip=False):
+def parse_config(file_path, config_schema):
     try:
         contents = file_path.text()
     except OSError as os_error:
         raise tsrc.InvalidConfig(file_path, "Could not read file: %s" % str(os_error))
     try:
-        if round_trip:
-            parsed = ruamel.yaml.safe_load(contents)
-        else:
-            parsed = ruamel.yaml.load(contents, ruamel.yaml.RoundTripLoader)
+        parsed = ruamel.yaml.load(contents, ruamel.yaml.RoundTripLoader)
     except ruamel.yaml.error.YAMLError as yaml_error:
         # pylint: disable=no-member
         context = "(ligne %s, col %s) " % (
@@ -32,6 +29,17 @@ def parse_config_file(file_path, config_schema, round_trip=False):
         raise tsrc.InvalidConfig(file_path, str(schema_error))
 
 
+def dump_config(config, file_path):
+    dumped = ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper)
+    file_path.write_text(dumped)
+
+
+def get_tsrc_config_path():
+    config_path = path.Path(xdg.XDG_CONFIG_HOME)
+    config_path = config_path.joinpath("tsrc.yml")
+    return config_path
+
+
 def parse_tsrc_config(config_path=None):
     auth_schema = {
         schema.Optional("gitlab"): {
@@ -41,8 +49,9 @@ def parse_tsrc_config(config_path=None):
             "token": str
         }
     }
-    tsrc_schema = schema.Schema({"auth": auth_schema})
+    tsrc_schema = schema.Schema({
+        schema.Optional("auth"): auth_schema
+    })
     if not config_path:
-        config_path = path.Path(xdg.XDG_CONFIG_HOME)
-        config_path = config_path.joinpath("tsrc.yml")
-    return parse_config_file(config_path, tsrc_schema)
+        config_path = get_tsrc_config_path()
+    return parse_config(config_path, tsrc_schema)

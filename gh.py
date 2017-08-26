@@ -1,5 +1,6 @@
 import argparse
 import getpass
+import uuid
 
 import github3
 
@@ -13,14 +14,16 @@ def get_token():
 
     scopes = ['repo']
 
-    note = "tsrc-test"
+    note = "tsrc-" + str(uuid.uuid4())
     note_url = "https://tankerapp.github.io/tsrc"
 
     gh = github3.GitHub()
     gh.login(user, password, two_factor_callback=lambda: input("2FA code: ").strip())
 
+    user = gh.user()
     auth = gh.authorize(user, password, scopes, note, note_url)
-    return auth.token
+    print(auth.token)
+    print(auth.id)
 
 
 def login_github():
@@ -32,6 +35,7 @@ def login_github():
 
 
 def login_with_token():
+    gh = login_github()
     user = gh.user()
     print("Hello", user.name)
 
@@ -45,14 +49,8 @@ def edit_release(tag, desc):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("tag")
-    parser.add_argument("desc")
-    args = parser.parse_args()
-    tag = args.tag
-    desc = args.desc
-    edit_release(tag, desc)
-
+    #get_token()
+    login_with_token()
 
 if __name__ == "__main__":
     main()
